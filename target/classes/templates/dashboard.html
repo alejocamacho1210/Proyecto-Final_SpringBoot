@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f6f7fb">
+    <title>CoWorkHub | Panel</title>
+    <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+    <button id="sidebarBackdrop" class="sidebar-backdrop" type="button" aria-label="Cerrar navegación" hidden></button>
+    <aside id="sidebar" class="sidebar">
+        <a class="brand" href="/dashboard"><span class="brand-mark small">C</span><strong>CoWorkHub</strong></a>
+        <nav aria-label="Navegación principal">
+            <button class="nav-item active" data-view="overview">Resumen</button>
+            <button class="nav-item" data-view="rooms">Salas y disponibilidad</button>
+            <button class="nav-item staff-only" data-view="members" hidden>Miembros</button>
+            <button class="nav-item" data-view="bookings">Reservas</button>
+            <button class="nav-item" data-view="catalogs">Catálogos</button>
+        </nav>
+        <button id="logoutButton" class="logout" type="button">Cerrar sesión</button>
+    </aside>
+
+    <main class="workspace">
+        <header class="topbar">
+            <div class="topbar-heading">
+                <button id="sidebarToggle" class="mobile-nav-toggle" type="button"
+                        aria-label="Abrir navegación" aria-expanded="false" aria-controls="sidebar">☰</button>
+                <div><p class="eyebrow">Panel de control</p><h1 id="viewTitle">Resumen</h1></div>
+            </div>
+            <div class="profile-pill"><span id="profileInitial">U</span><div><b id="profileName">Usuario</b><small id="profileRole"></small></div></div>
+        </header>
+
+        <section id="overviewView" class="view active">
+            <div class="stats" id="stats"></div>
+            <div class="grid-two">
+                <article class="panel">
+                    <div class="panel-head"><h2>Reservas recientes</h2><button class="text-button" type="button" data-open-view="bookings">Ver todas</button></div>
+                    <div id="recentBookings" class="table-wrap"></div>
+                </article>
+                <article id="consumptionPanel" class="panel" hidden>
+                    <div class="panel-head"><h2>Mi consumo mensual</h2></div>
+                    <label class="month-filter">Mes<input id="consumptionMonth" type="month"></label>
+                    <div id="consumption" class="consumption"></div>
+                </article>
+            </div>
+        </section>
+
+        <section id="roomsView" class="view">
+            <div class="toolbar"><div><p class="eyebrow">Encuentra el espacio ideal</p><h2>Salas y disponibilidad</h2></div></div>
+            <form id="availabilityForm" class="filter-row">
+                <label>Sede<select id="locationFilter" required></select></label>
+                <label>Fecha<input id="availabilityDate" type="date" required></label>
+                <label>Desde<input id="availabilityStart" type="time" value="09:00" required></label>
+                <label>Hasta<input id="availabilityEnd" type="time" value="10:00" required></label>
+                <label>Capacidad mínima<input id="minimumCapacity" type="number" min="1" value="1"></label>
+                <label>Equipamiento<select id="equipmentFilter" multiple aria-describedby="equipmentHint"></select><small id="equipmentHint">Puedes elegir varios.</small></label>
+                <button class="primary small" type="submit">Buscar disponibilidad</button>
+            </form>
+            <div id="roomsGrid" class="card-grid"></div>
+        </section>
+
+        <section id="membersView" class="view">
+            <div class="toolbar">
+                <div><p class="eyebrow">Gestión de clientes</p><h2>Miembros</h2></div>
+                <button class="primary small" id="createMemberButton" type="button">Registrar miembro</button>
+            </div>
+            <form id="memberFilter" class="filter-row">
+                <label>Nombre<input id="memberName" autocomplete="off"></label>
+                <label>Estado<select id="memberStatus"><option value="">Todos</option><option value="ACTIVE">Activo</option><option value="SUSPENDED">Suspendido</option></select></label>
+                <button class="secondary small" type="submit">Filtrar</button>
+                <button class="text-button" id="clearMemberFilter" type="button">Limpiar</button>
+            </form>
+            <div id="membersTable" class="table-wrap"></div>
+        </section>
+
+        <section id="bookingsView" class="view">
+            <div class="toolbar">
+                <div><p class="eyebrow">Organiza tu espacio</p><h2>Reservas</h2></div>
+                <button class="primary small" id="openBookingForm" type="button">Nueva reserva</button>
+            </div>
+            <div id="bookingFormPanel" class="panel form-panel" hidden>
+                <div class="panel-head"><h3>Datos de la reserva</h3><button class="icon-button" id="closeBookingForm" type="button" aria-label="Cerrar formulario">×</button></div>
+                <form id="bookingForm" class="form-grid">
+                    <label>Sala<select id="bookingRoom" required></select></label>
+                    <label id="bookingMemberField">Miembro<select id="bookingMember" required></select></label>
+                    <label>Inicio<input id="bookingStart" type="datetime-local" required></label>
+                    <label>Fin<input id="bookingEnd" type="datetime-local" required></label>
+                    <label>Asistentes<input id="bookingAttendees" type="number" min="1" value="1" required></label>
+                    <fieldset class="service-field"><legend>Servicios adicionales</legend><div id="bookingServices" class="service-checklist"></div></fieldset>
+                    <div class="form-actions"><button class="primary" type="submit">Crear reserva</button><button class="secondary" id="cancelBookingForm" type="button">Cancelar</button></div>
+                </form>
+            </div>
+            <form id="bookingFilter" class="filter-row">
+                <label>Estado<select id="bookingStatus"><option value="">Todos</option><option value="PENDING">Pendiente</option><option value="CONFIRMED">Confirmada</option><option value="COMPLETED">Completada</option><option value="CANCELLED">Cancelada</option></select></label>
+                <label>Fecha<input id="bookingDateFilter" type="date"></label>
+                <button class="text-button" type="reset">Limpiar filtros</button>
+            </form>
+            <div id="bookingsTable" class="table-wrap"></div>
+        </section>
+
+        <section id="catalogsView" class="view">
+            <div class="toolbar"><div><p class="eyebrow">Consulta la oferta del coworking</p><h2>Catálogos</h2></div></div>
+            <div class="catalog-grid">
+                <article class="panel catalog-panel" data-catalog-panel="locations"><div class="panel-head"><h3>Sedes</h3><button class="primary small admin-only" data-create-catalog="location" type="button" hidden>Agregar</button></div><div id="locationsList"></div></article>
+                <article class="panel catalog-panel" data-catalog-panel="rooms"><div class="panel-head"><h3>Salas</h3><button class="primary small admin-only" data-create-catalog="room" type="button" hidden>Agregar</button></div><div id="catalogRoomsList"></div></article>
+                <article class="panel catalog-panel" data-catalog-panel="equipment"><div class="panel-head"><h3>Equipamiento</h3><button class="primary small admin-only" data-create-catalog="equipment" type="button" hidden>Agregar</button></div><div id="equipmentList"></div></article>
+                <article class="panel catalog-panel" data-catalog-panel="services"><div class="panel-head"><h3>Servicios adicionales</h3><button class="primary small admin-only" data-create-catalog="service" type="button" hidden>Agregar</button></div><div id="servicesList"></div></article>
+                <article class="panel catalog-panel" data-catalog-panel="plans"><div class="panel-head"><h3>Planes</h3><button class="primary small admin-only" data-create-catalog="plan" type="button" hidden>Agregar</button></div><div id="plansList"></div></article>
+            </div>
+        </section>
+    </main>
+
+    <div id="editorModal" class="modal" hidden>
+        <div class="modal-backdrop" data-close-modal></div>
+        <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="editorTitle">
+            <div class="panel-head"><div><p class="eyebrow" id="editorKicker">CoWorkHub</p><h2 id="editorTitle"></h2></div><button class="icon-button" type="button" data-close-modal aria-label="Cerrar">×</button></div>
+            <form id="editorForm" class="form-grid"></form>
+        </section>
+    </div>
+    <div id="serviceModal" class="modal" hidden>
+        <div class="modal-backdrop" data-close-modal></div>
+        <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="serviceModalTitle">
+            <div class="panel-head"><div><p class="eyebrow">Reserva pendiente</p><h2 id="serviceModalTitle">Servicios de la reserva</h2></div><button class="icon-button" type="button" data-close-modal aria-label="Cerrar">×</button></div>
+            <div id="bookingServiceItems"></div>
+            <form id="addBookingServiceForm" class="form-grid compact-form">
+                <label>Servicio<select id="additionalServiceId" required></select></label>
+                <label>Cantidad<input id="additionalServiceQuantity" type="number" min="1" value="1" required></label>
+                <button class="primary" type="submit">Agregar servicio</button>
+            </form>
+        </section>
+    </div>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <script src="/js/app.js"></script>
+</body>
+</html>

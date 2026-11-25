@@ -1,0 +1,1 @@
+-- Base temporal H2 sin datos iniciales.

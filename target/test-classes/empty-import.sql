@@ -1,0 +1,1 @@
+-- Data is loaded explicitly by the test after translating MySQL date expressions for H2.

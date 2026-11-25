@@ -1,0 +1,1160 @@
+{
+  "info": {
+    "_postman_id": "984084e8-911e-4d0b-a6b2-80d26a680001",
+    "name": "CoWorkHub - 14 casos de aceptación",
+    "description": "Ejecute primero Preparación y luego los casos 01–14 en orden. Los datos asumidos corresponden al seed actual: sala 1, miembros Ana id 1 y Luis id 2, servicio adicional Cafe id 1, sede 1 y miembro suspendido id 5. Vuelva a sembrar/restablecer la base antes de repetir casos que crean reservas. Las fechas se calculan dinámicamente; los escenarios de cancelación buscan horarios que respetan la apertura de la sede. El caso 07 puede omitirse automáticamente si no hay una franja abierta entre aproximadamente 1 h 06 min y 1 h 54 min desde el momento de ejecución, por el requisito de anticipación mínima de la API. El caso 13 exige envío manual simultáneo de dos solicitudes. La URL base local está configurada en 8081; si ejecuta la aplicación en el puerto predeterminado, cambie la variable baseUrl a http://localhost:8080.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8081"
+    },
+    {
+      "key": "tokenAdmin",
+      "value": ""
+    },
+    {
+      "key": "tokenRecepcionista",
+      "value": ""
+    },
+    {
+      "key": "tokenAna",
+      "value": ""
+    },
+    {
+      "key": "tokenLuis",
+      "value": ""
+    },
+    {
+      "key": "bookingOwnId",
+      "value": ""
+    },
+    {
+      "key": "bookingOverlapId",
+      "value": ""
+    },
+    {
+      "key": "bookingAdjacentId",
+      "value": ""
+    },
+    {
+      "key": "booking30hId",
+      "value": ""
+    },
+    {
+      "key": "booking5hId",
+      "value": ""
+    },
+    {
+      "key": "bookingShortId",
+      "value": ""
+    },
+    {
+      "key": "fechaCaso",
+      "value": ""
+    },
+    {
+      "key": "horaCaso",
+      "value": ""
+    },
+    {
+      "key": "fechaVentana30",
+      "value": ""
+    },
+    {
+      "key": "horaVentana30",
+      "value": ""
+    },
+    {
+      "key": "fechaVentana5",
+      "value": ""
+    },
+    {
+      "key": "horaVentana5",
+      "value": ""
+    },
+    {
+      "key": "fechaVentanaCorta",
+      "value": ""
+    },
+    {
+      "key": "horaVentanaCorta",
+      "value": ""
+    },
+    {
+      "key": "ventanaCortaDisponible",
+      "value": "false"
+    },
+    {
+      "key": "horaFinVentana30",
+      "value": ""
+    },
+    {
+      "key": "horaFinVentana5",
+      "value": ""
+    },
+    {
+      "key": "horaFinVentanaCorta",
+      "value": ""
+    },
+    {
+      "key": "fechaConcurrente",
+      "value": ""
+    },
+    {
+      "key": "roomCost5h",
+      "value": "0"
+    }
+  ],
+  "item": [
+    {
+      "name": "Preparación - iniciar sesión (ejecutar antes de los casos)",
+      "description": "Obtiene los tokens de las cuentas sembradas. No forma parte de los 14 casos de aceptación.",
+      "item": [
+        {
+          "name": "Login admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Login correcto', function () { pm.response.to.have.status(200); const b=pm.response.json(); pm.expect(b.token).to.be.a('string'); pm.expect(b.tipo).to.eql('Bearer'); pm.expect(b.venceEnMinutos).to.be.a('number'); });",
+                  "pm.collectionVariables.set('tokenAdmin', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"coworkhub123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/auth/login"
+          }
+        },
+        {
+          "name": "Login recepcionista",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Login correcto', function () { pm.response.to.have.status(200); const b=pm.response.json(); pm.expect(b.token).to.be.a('string'); pm.expect(b.tipo).to.eql('Bearer'); pm.expect(b.venceEnMinutos).to.be.a('number'); });",
+                  "pm.collectionVariables.set('tokenRecepcionista', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"recepcionista\",\n  \"password\": \"coworkhub123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/auth/login"
+          }
+        },
+        {
+          "name": "Login ana",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Login correcto', function () { pm.response.to.have.status(200); const b=pm.response.json(); pm.expect(b.token).to.be.a('string'); pm.expect(b.tipo).to.eql('Bearer'); pm.expect(b.venceEnMinutos).to.be.a('number'); });",
+                  "pm.collectionVariables.set('tokenAna', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"ana\",\n  \"password\": \"coworkhub123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/auth/login"
+          }
+        },
+        {
+          "name": "Login luis",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Login correcto', function () { pm.response.to.have.status(200); const b=pm.response.json(); pm.expect(b.token).to.be.a('string'); pm.expect(b.tipo).to.eql('Bearer'); pm.expect(b.venceEnMinutos).to.be.a('number'); });",
+                  "pm.collectionVariables.set('tokenLuis', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"luis\",\n  \"password\": \"coworkhub123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/auth/login"
+          }
+        }
+      ]
+    },
+    {
+      "name": "01 - Reserva válida con servicios adicionales",
+      "description": "Requiere el conjunto de datos sembrado; usa sala 1, miembro Luis (2), servicio Cafe (1). Fecha dinámica a 10 días.",
+      "item": [
+        {
+          "name": "Crear reserva con café",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const d = new Date(); d.setDate(d.getDate() + 10); d.setHours(11, 0, 0, 0);",
+                  "const p = n => String(n).padStart(2, '0');",
+                  "pm.collectionVariables.set('fechaCaso', d.getFullYear() + '-' + p(d.getMonth()+1) + '-' + p(d.getDate()));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Reserva 201 e incluye servicio y costos', function () { pm.response.to.have.status(201); const b=pm.response.json(); pm.collectionVariables.set('bookingOwnId', b.id); pm.expect(b.status).to.eql('PENDING'); pm.expect(b.items).to.have.length(1); pm.expect(b.items[0].serviceId).to.eql(1); pm.expect(b.servicesCost).to.be.a('number'); pm.expect(b.totalCost).to.be.a('number'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenLuis}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"salaId\": 1,\n  \"miembroId\": 2,\n  \"inicio\": \"{{fechaCaso}}T11:00:00\",\n  \"fin\": \"{{fechaCaso}}T12:00:00\",\n  \"asistentes\": 2,\n  \"servicios\": [\n    {\n      \"servicioId\": 1,\n      \"cantidad\": 2\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/reservas"
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 - Conflicto por reservas superpuestas",
+      "description": "Crea una reserva y vuelve a enviar la misma franja de sala 1; la segunda solicitud debe dar 409 (RN-01).",
+      "item": [
+        {
+          "name": "Crear reserva inicial",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const d = new Date(); d.setDate(d.getDate() + 12); d.setHours(11, 0, 0, 0);",
+                  "const p = n => String(n).padStart(2, '0');",
+                  "pm.collectionVariables.set('fechaCaso', d.getFullYear() + '-' + p(d.getMonth()+1) + '-' + p(d.getDate()));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Reserva creada (201)', function () { pm.response.to.have.status(201); const b=pm.response.json(); pm.expect(b.status).to.eql('PENDING'); pm.expect(b.totalCost).to.be.a('number'); pm.collectionVariables.set('bookingOverlapId', b.id); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenLuis}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"salaId\": 1,\n  \"miembroId\": 2,\n  \"inicio\": \"{{fechaCaso}}T13:00:00\",\n  \"fin\": \"{{fechaCaso}}T14:00:00\",\n  \"asistentes\": 2,\n  \"servicios\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/reservas"
+          }
+        },
+        {
+          "name": "Intentar reservar la misma franja",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('La superposición se rechaza (409 RN-01)', function () { pm.response.to.have.status(409); const b=pm.response.json(); pm.expect(b.codigo).to.eql('RN-01'); pm.expect(b).to.have.all.keys('error','codigo','timestamp'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenLuis}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"salaId\": 1,\n  \"miembroId\": 2,\n  \"inicio\": \"{{fechaCaso}}T13:00:00\",\n  \"fin\": \"{{fechaCaso}}T14:00:00\",\n  \"asistentes\": 2,\n  \"servicios\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/reservas"
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 - Se permite una reserva adyacente",
+      "description": "Dos intervalos contiguos para la misma sala, sin solapamiento: ambos deben crearse.",
+      "item": [
+        {
+          "name": "Reserva 13:00 a 14:00",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const d = new Date(); d.setDate(d.getDate() + 13); d.setHours(11, 0, 0, 0);",
+                  "const p = n => String(n).padStart(2, '0');",
+                  "pm.collectionVariables.set('fechaCaso', d.getFullYear() + '-' + p(d.getMonth()+1) + '-' + p(d.getDate()));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Reserva creada (201)', function () { pm.response.to.have.status(201); const b=pm.response.json(); pm.expect(b.status).to.eql('PENDING'); pm.expect(b.totalCost).to.be.a('number'); pm.collectionVariables.set('bookingAdjacentId', b.id); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenLuis}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"salaId\": 1,\n  \"miembroId\": 2,\n  \"inicio\": \"{{fechaCaso}}T13:00:00\",\n  \"fin\": \"{{fechaCaso}}T14:00:00\",\n  \"asistentes\": 2,\n  \"servicios\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/reservas"
+          }
+        },
+        {
+          "name": "Reserva adyacente 14:00 a 15:00",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Reserva creada (201)', function () { pm.response.to.have.status(201); const b=pm.response.json(); pm.expect(b.status).to.eql('PENDING'); pm.expect(b.totalCost).to.be.a('number'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenLuis}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"salaId\": 1,\n  \"miembroId\": 2,\n  \"inicio\": \"{{fechaCaso}}T14:00:00\",\n  \"fin\": \"{{fechaCaso}}T15:00:00\",\n  \"asistentes\": 2,\n  \"servicios\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/reservas"
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 - Duración inválida y horario fuera de apertura",
+      "description": "La duración debe ser múltiplo de 30 minutos; la sede 1 abre 08:00–20:00. Ambos casos devuelven 409 con error estructurado.",
+      "item": [
+        {
+          "name": "Duración menor que 30 minutos",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const d = new Date(); d.setDate(d.getDate() + 14); d.setHours(11, 0, 0, 0);",
+                  "const p = n => String(n).padStart(2, '0');",
+                  "pm.collectionVariables.set('fechaCaso', d.getFullYear() + '-' + p(d.getMonth()+1) + '-' + p(d.getDate()));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Duración inválida rechazada (409)', function () { pm.response.to.have.status(409); pm.expect(pm.response.json()).to.have.all.keys('error','codigo','timestamp'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenLuis}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"salaId\": 1,\n  \"miembroId\": 2,\n  \"inicio\": \"{{fechaCaso}}T11:00:00\",\n  \"fin\": \"{{fechaCaso}}T11:15:00\",\n  \"asistentes\": 2,\n  \"servicios\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/reservas"
+          }
+        },
+        {
+          "name": "Horario posterior al cierre",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Fuera de horario rechazado (409)', function () { pm.response.to.have.status(409); pm.expect(pm.response.json()).to.have.all.keys('error','codigo','timestamp'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenLuis}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"salaId\": 1,\n  \"miembroId\": 2,\n  \"inicio\": \"{{fechaCaso}}T20:00:00\",\n  \"fin\": \"{{fechaCaso}}T21:00:00\",\n  \"asistentes\": 2,\n  \"servicios\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/reservas"
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 - Cancelar con al menos 30 horas de anticipación (sin cargo)",
+      "item": [
+        {
+          "name": "Crear reserva en la ventana temporal",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const now = Date.now(); let slot = new Date(now + 30 * 3600000); slot.setSeconds(0,0); slot.setMilliseconds(0);",
+                  "const limit = now + 72 * 3600000; let found = null;",
+                  "while (slot.getTime() <= limit) { const minutes = slot.getHours()*60 + slot.getMinutes(); if (minutes >= 8*60 && minutes + 60 <= 20*60) { found = slot; break; } slot = new Date(slot.getTime() + 30*60000); }",
+                  "if (!found) { pm.collectionVariables.set('ventanaCortaDisponible', 'false'); throw new Error(\"No hay una franja de apertura en la ventana temporal solicitada; ajuste la hora o vuelva a ejecutar.\"); } else {",
+                  "const p = n => String(n).padStart(2, '0');",
+                  "pm.collectionVariables.set('fechaVentana30', found.getFullYear() + '-' + p(found.getMonth()+1) + '-' + p(found.getDate()));",
+                  "pm.collectionVariables.set('horaVentana30', p(found.getHours()) + ':' + p(found.getMinutes()) + ':00');",
+                  "pm.collectionVariables.set('ventanaCortaDisponible', 'true'); const end = new Date(found.getTime() + 3600000); pm.collectionVariables.set('horaFinVentana30', p(end.getHours()) + ':' + p(end.getMinutes()) + ':00'); }"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Reserva creada para el caso de cancelación', function () { pm.response.to.have.status(201); pm.collectionVariables.set('booking30hId', pm.response.json().id); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenLuis}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"salaId\": 1,\n  \"miembroId\": 2,\n  \"inicio\": \"{{fechaVentana30}}T{{horaVentana30}}\",\n  \"fin\": \"{{fechaVentana30}}T{{horaFinVentana30}}\",\n  \"asistentes\": 2,\n  \"servicios\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/reservas"
+          }
+        },
+        {
+          "name": "Cancelar reserva",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Cancelación aceptada y estado CANCELLED', function () { pm.response.to.have.status(200); const b=pm.response.json(); pm.expect(b.status).to.eql('CANCELLED'); pm.expect(b.cancellationFee).to.be.a('number');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenLuis}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/reservas/{{booking30hId}}/cancelar"
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 - Cancelar con 5 a menos de 24 horas (con cargo aplicable)",
+      "item": [
+        {
+          "name": "Crear reserva en la ventana temporal",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const now = Date.now(); let slot = new Date(now + 5 * 3600000); slot.setSeconds(0,0); slot.setMilliseconds(0);",
+                  "const limit = now + 24 * 3600000; let found = null;",
+                  "while (slot.getTime() <= limit) { const minutes = slot.getHours()*60 + slot.getMinutes(); if (minutes >= 8*60 && minutes + 60 <= 20*60) { found = slot; break; } slot = new Date(slot.getTime() + 30*60000); }",
+                  "if (!found) { pm.collectionVariables.set('ventanaCortaDisponible', 'false'); throw new Error(\"No hay una franja de apertura en la ventana temporal solicitada; ajuste la hora o vuelva a ejecutar.\"); } else {",
+                  "const p = n => String(n).padStart(2, '0');",
+                  "pm.collectionVariables.set('fechaVentana5', found.getFullYear() + '-' + p(found.getMonth()+1) + '-' + p(found.getDate()));",
+                  "pm.collectionVariables.set('horaVentana5', p(found.getHours()) + ':' + p(found.getMinutes()) + ':00');",
+                  "pm.collectionVariables.set('ventanaCortaDisponible', 'true'); const end = new Date(found.getTime() + 3600000); pm.collectionVariables.set('horaFinVentana5', p(end.getHours()) + ':' + p(end.getMinutes()) + ':00'); }"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Reserva creada para el caso de cancelación', function () { pm.response.to.have.status(201); pm.collectionVariables.set('booking5hId', pm.response.json().id); });",
+                  "pm.collectionVariables.set('roomCost5h', pm.response.json().roomCost);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenRecepcionista}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"salaId\": 1,\n  \"miembroId\": 3,\n  \"inicio\": \"{{fechaVentana5}}T{{horaVentana5}}\",\n  \"fin\": \"{{fechaVentana5}}T{{horaFinVentana5}}\",\n  \"asistentes\": 2,\n  \"servicios\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/reservas"
+          }
+        },
+        {
+          "name": "Cancelar reserva",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Cancelación aceptada y estado CANCELLED', function () { pm.response.to.have.status(200); const b=pm.response.json(); pm.expect(b.status).to.eql('CANCELLED'); pm.expect(b.cancellationFee).to.be.a('number');",
+                  "const expected = Math.round(Number(pm.collectionVariables.get('roomCost5h')) * 50) / 100; pm.expect(Math.abs(b.cancellationFee - expected)).to.be.lessThan(0.01);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenRecepcionista}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/reservas/{{booking5hId}}/cancelar"
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 - Intentar cancelar cerca de 1 hora de anticipación (menos de 2 horas)",
+      "item": [
+        {
+          "name": "Crear reserva en la ventana temporal",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const now = Date.now(); let slot = new Date(now + 1.1 * 3600000); slot.setSeconds(0,0); slot.setMilliseconds(0);",
+                  "const limit = now + 1.9 * 3600000; let found = null;",
+                  "while (slot.getTime() <= limit) { const minutes = slot.getHours()*60 + slot.getMinutes(); if (minutes >= 8*60 && minutes + 60 <= 20*60) { found = slot; break; } slot = new Date(slot.getTime() + 30*60000); }",
+                  "if (!found) { pm.collectionVariables.set('ventanaCortaDisponible', 'false'); pm.execution.skipRequest(); } else {",
+                  "const p = n => String(n).padStart(2, '0');",
+                  "pm.collectionVariables.set('fechaVentanaCorta', found.getFullYear() + '-' + p(found.getMonth()+1) + '-' + p(found.getDate()));",
+                  "pm.collectionVariables.set('horaVentanaCorta', p(found.getHours()) + ':' + p(found.getMinutes()) + ':00');",
+                  "pm.collectionVariables.set('ventanaCortaDisponible', 'true'); const end = new Date(found.getTime() + 3600000); pm.collectionVariables.set('horaFinVentanaCorta', p(end.getHours()) + ':' + p(end.getMinutes()) + ':00'); }"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Reserva creada para el caso de cancelación', function () { pm.response.to.have.status(201); pm.collectionVariables.set('bookingShortId', pm.response.json().id); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenLuis}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"salaId\": 3,\n  \"miembroId\": 2,\n  \"inicio\": \"{{fechaVentanaCorta}}T{{horaVentanaCorta}}\",\n  \"fin\": \"{{fechaVentanaCorta}}T{{horaFinVentanaCorta}}\",\n  \"asistentes\": 2,\n  \"servicios\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/reservas"
+          }
+        },
+        {
+          "name": "Cancelar reserva",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.collectionVariables.get('ventanaCortaDisponible') !== 'true') pm.execution.skipRequest();"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Cancelación rechazada por menos de 2 horas (409 RN-08)', function () { pm.response.to.have.status(409); const b=pm.response.json(); pm.expect(b.codigo).to.eql('RN-08'); pm.expect(b).to.have.all.keys('error','codigo','timestamp'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenLuis}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/reservas/{{bookingShortId}}/cancelar"
+          }
+        }
+      ],
+      "description": "La reserva debe iniciarse entre aproximadamente 1 h 06 min y menos de 2 horas desde ahora: la API exige que toda reserva empiece con más de 1 hora de anticipación. Se omite automáticamente si no existe una franja abierta en ese intervalo."
+    },
+    {
+      "name": "08 - No se puede confirmar una reserva cancelada",
+      "item": [
+        {
+          "name": "Confirmar la reserva cancelada en el caso 05",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Una reserva cancelada no se confirma (409 RN-09)', function () { pm.response.to.have.status(409); pm.expect(pm.response.json().codigo).to.eql('RN-09'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenRecepcionista}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/reservas/{{booking30hId}}/confirmar"
+          }
+        }
+      ]
+    },
+    {
+      "name": "09 - Un miembro no puede leer la reserva de otro miembro",
+      "description": "La reserva del caso 01 pertenece a Luis (miembroId 2); Ana autenticada debe recibir 403.",
+      "item": [
+        {
+          "name": "Ana intenta leer la reserva de Luis",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Acceso a reserva ajena denegado (403)', function () { pm.response.to.have.status(403); pm.expect(pm.response.json().codigo).to.eql('FORBIDDEN'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAna}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/reservas/{{bookingOwnId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "10 - Token ausente o manipulado devuelve 401",
+      "item": [
+        {
+          "name": "Consultar sala sin token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Token ausente devuelve 401', function () { pm.response.to.have.status(401); pm.expect(pm.response.json().codigo).to.eql('UNAUTHORIZED'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/salas/1"
+          }
+        },
+        {
+          "name": "Consultar sala con token manipulado",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": []
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Token inválido devuelve 401', function () { pm.response.to.have.status(401); pm.expect(pm.response.json().codigo).to.eql('UNAUTHORIZED'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer token-manipulado"
+              }
+            ],
+            "url": "{{baseUrl}}/api/salas/1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "11 - No se elimina una sala con reservas",
+      "description": "La sala sembrada id=1 tiene reservas asociadas. Se espera 409 con código RN-12.",
+      "item": [
+        {
+          "name": "Administrador intenta eliminar la sala 1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Sala con reservas no se elimina (409 RN-12)', function () { pm.response.to.have.status(409); pm.expect(pm.response.json().codigo).to.eql('RN-12'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/salas/1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "12 - Nombre de sede requerido",
+      "description": "La solicitud omite name y contiene los demás campos obligatorios; se espera 400 VALIDATION_ERROR.",
+      "item": [
+        {
+          "name": "Crear sede sin name",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Nombre requerido produce 400 VALIDATION_ERROR', function () { pm.response.to.have.status(400); pm.expect(pm.response.json().codigo).to.eql('VALIDATION_ERROR'); pm.expect(pm.response.json()).to.have.all.keys('error','codigo','timestamp'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"city\": \"Bogota\",\n  \"address\": \"Calle de prueba 123\",\n  \"openingTime\": \"08:00:00\",\n  \"closingTime\": \"20:00:00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/sedes"
+          }
+        }
+      ]
+    },
+    {
+      "name": "13 - Dos solicitudes concurrentes para la misma franja",
+      "description": "No ejecute este caso con un runner secuencial. Abra ambas solicitudes en pestañas/ventanas separadas y pulse Send casi simultáneamente; use el mismo collection variable fechaConcurrente y no cambie sala, miembro ni horario. Resultado esperado en conjunto: exactamente una respuesta 201 y una 409 (RN-01). Cada solicitud valida un código permitido; compare ambas respuestas manualmente.",
+      "item": [
+        {
+          "name": "Solicitud concurrente A - enviar junto con B",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const d = new Date(); d.setDate(d.getDate() + 14); d.setHours(11, 0, 0, 0);",
+                  "const p = n => String(n).padStart(2, '0');",
+                  "pm.collectionVariables.set('fechaConcurrente', d.getFullYear() + '-' + p(d.getMonth()+1) + '-' + p(d.getDate()));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('concurrentStatusA', pm.response.code); pm.test('La respuesta A debe ser 201 o 409', function () { pm.expect(pm.response.code).to.be.oneOf([201,409]); if(pm.response.code===409) pm.expect(pm.response.json().codigo).to.eql('RN-01'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"salaId\": 1,\n  \"miembroId\": 4,\n  \"inicio\": \"{{fechaConcurrente}}T11:00:00\",\n  \"fin\": \"{{fechaConcurrente}}T12:00:00\",\n  \"asistentes\": 2,\n  \"servicios\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/reservas"
+          }
+        },
+        {
+          "name": "Solicitud concurrente B - enviar junto con A",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const d = new Date(); d.setDate(d.getDate() + 14); d.setHours(11, 0, 0, 0);",
+                  "const p = n => String(n).padStart(2, '0');",
+                  "pm.collectionVariables.set('fechaConcurrente', d.getFullYear() + '-' + p(d.getMonth()+1) + '-' + p(d.getDate()));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('concurrentStatusB', pm.response.code); pm.test('Las dos solicitudes producen exactamente un 201 y un 409', function () { const statuses = [Number(pm.collectionVariables.get('concurrentStatusA')), pm.response.code].sort(); pm.expect(statuses).to.eql([201,409]); if(pm.response.code===409) pm.expect(pm.response.json().codigo).to.eql('RN-01'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"salaId\": 1,\n  \"miembroId\": 4,\n  \"inicio\": \"{{fechaConcurrente}}T11:00:00\",\n  \"fin\": \"{{fechaConcurrente}}T12:00:00\",\n  \"asistentes\": 2,\n  \"servicios\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/reservas"
+          }
+        }
+      ]
+    },
+    {
+      "name": "14 - Filtrar miembros suspendidos",
+      "description": "El conjunto sembrado contiene el miembro suspendido id=5.",
+      "item": [
+        {
+          "name": "Listar miembros suspendidos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('El filtro devuelve únicamente miembros suspendidos e incluye id 5', function () { pm.response.to.have.status(200); const a=pm.response.json(); pm.expect(a).to.be.an('array'); pm.expect(a.some(m=>m.id===5 && m.status==='SUSPENDED')).to.eql(true); pm.expect(a.every(m=>m.status==='SUSPENDED')).to.eql(true); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenRecepcionista}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/miembros?estado=SUSPENDED"
+          }
+        }
+      ]
+    }
+  ]
+}
