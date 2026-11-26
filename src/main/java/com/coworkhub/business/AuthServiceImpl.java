@@ -3,6 +3,7 @@ package com.coworkhub.business;
 import com.coworkhub.security.AccountUserDetails;
 import com.coworkhub.security.JwtService;
 import com.coworkhub.presentation.ApiDtos.LoginResponse;
+import com.coworkhub.presentation.ApiDtos.MemberRequest;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
@@ -11,9 +12,17 @@ import org.springframework.stereotype.Service;
 public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
-    public AuthServiceImpl(AuthenticationManager authenticationManager, JwtService jwtService) {
-        this.authenticationManager = authenticationManager; this.jwtService = jwtService;
+    private final MemberService members;
+    public AuthServiceImpl(AuthenticationManager authenticationManager, JwtService jwtService, MemberService members) {
+        this.authenticationManager = authenticationManager; this.jwtService = jwtService; this.members = members;
     }
+
+    @Override
+    public LoginResponse register(MemberRequest request) {
+        members.create(request);
+        return login(request.username().trim(), request.password());
+    }
+
     @Override
     public LoginResponse login(String username, String password) {
         try {

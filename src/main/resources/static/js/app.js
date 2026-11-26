@@ -90,6 +90,84 @@ if (loginForm) {
       submit.disabled = false;
     }
   });
+
+  const registerForm = byId('registerForm');
+  const demoUsers = document.querySelector('.demo-users');
+  const loginSwitch = byId('loginSwitch');
+  const registerSwitch = byId('registerSwitch');
+
+  byId('showRegister').addEventListener('click', async () => {
+    loginForm.hidden = true;
+    demoUsers.hidden = true;
+    loginSwitch.hidden = true;
+    registerForm.hidden = false;
+    registerSwitch.hidden = false;
+    byId('loginError').textContent = '';
+    byId('registerDocumentNumber').focus();
+
+    const select = byId('registerPlan');
+    if (select.dataset.loaded === 'true') return;
+    try {
+      const response = await fetch('/auth/planes', { headers: { 'Accept': 'application/json' } });
+      const plans = await response.json();
+      if (!response.ok) throw new Error(plans.error || 'No se pudieron cargar los planes.');
+      const placeholder = document.createElement('option');
+      placeholder.value = '';
+      placeholder.textContent = 'Selecciona un plan';
+      placeholder.disabled = true;
+      placeholder.selected = true;
+      select.replaceChildren(placeholder);
+      plans.forEach(plan => {
+        const option = document.createElement('option');
+        option.value = plan.id;
+        option.textContent = `${plan.name} — ${plan.includedHoursPerMonth} h/mes`;
+        select.append(option);
+      });
+      select.dataset.loaded = 'true';
+    } catch (failure) {
+      byId('registerError').textContent = failure.message || 'No se pudieron cargar los planes.';
+    }
+  });
+
+  byId('showLogin').addEventListener('click', () => {
+    registerForm.hidden = true;
+    registerSwitch.hidden = true;
+    loginForm.hidden = false;
+    demoUsers.hidden = false;
+    loginSwitch.hidden = false;
+    byId('registerError').textContent = '';
+    byId('username').focus();
+  });
+
+  registerForm.addEventListener('submit', async event => {
+    event.preventDefault();
+    const error = byId('registerError');
+    const submit = registerForm.querySelector('[type="submit"]');
+    error.textContent = '';
+    submit.disabled = true;
+    try {
+      const response = await fetch('/auth/registro', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({
+          documentNumber: byId('registerDocumentNumber').value.trim(),
+          fullName: byId('registerFullName').value.trim(),
+          email: byId('registerEmail').value.trim(),
+          planId: Number(byId('registerPlan').value),
+          username: byId('registerUsername').value.trim(),
+          password: byId('registerPassword').value
+        })
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'No se pudo crear la cuenta.');
+      localStorage.setItem(tokenKey, result.token);
+      location.replace('/dashboard');
+    } catch (failure) {
+      error.textContent = failure.message || 'No se pudo crear la cuenta.';
+    } finally {
+      submit.disabled = false;
+    }
+  });
 }
 
 function startDashboard() {

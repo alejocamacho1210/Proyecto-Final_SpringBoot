@@ -57,7 +57,8 @@ public class SecurityConfiguration {
                 .accessDeniedHandler(accessDeniedHandler()))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/", "/login", "/dashboard", "/css/**", "/js/**", "/images/**",
-                    "/auth/login", "/actuator/health", "/doc/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                    "/auth/login", "/auth/planes", "/auth/registro", "/actuator/health",
+                    "/doc/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .anyRequest().authenticated())
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

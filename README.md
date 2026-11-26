@@ -120,6 +120,7 @@ Además de la API, el proyecto incluye una interfaz responsive integrada con **T
 - Panel: `http://localhost:8080/dashboard`
 - La sesión y las acciones disponibles se determinan por el rol `ADMIN`, `RECEPTIONIST` o `MEMBER`.
 - La disponibilidad se filtra por sede, fecha, horario, capacidad y equipamiento; desde un resultado se puede iniciar una reserva y agregar varios servicios.
+- Desde el inicio de sesión, cualquier persona puede crear una cuenta `MEMBER` y elegir un plan. El registro crea un `Member` y su `UserAccount`; el resto de los roles no se pueden elegir ni crear desde ese formulario.
 - ADMIN gestiona los catálogos; ADMIN y RECEPTIONIST registran, editan, suspenden, activan y eliminan miembros, además de gestionar estados y cancelaciones de reservas.
 - MEMBER consulta catálogos, crea, consulta, modifica y cancela solo sus reservas, y consulta su consumo por mes. Las reservas se pueden editar mientras están pendientes; la edición conserva sus servicios y aplica las mismas reglas de horario y disponibilidad.
 - La navegación y los formularios se adaptan a pantallas móviles.
@@ -129,6 +130,8 @@ El frontend guarda el JWT recibido por `/auth/login` en el navegador y lo usa co
 ## API
 
 Los catálogos están bajo `/api`: `/sedes`, `/salas`, `/equipamientos`, `/servicios-adicionales` y `/planes`. Los demás recursos principales son `/api/disponibilidad`, `/api/miembros` y `/api/reservas`. Las rutas de administración requieren rol administrador; las operaciones sobre miembros y reservas aplican permisos por rol y propiedad. La especificación OpenAPI describe métodos, parámetros, cuerpos, respuestas y seguridad.
+
+`GET /auth/planes` ofrece los planes para el formulario público y `POST /auth/registro` crea una cuenta de miembro (`MEMBER`) y devuelve un JWT. Los datos se guardan en MySQL, en `members` y `user_accounts`; no se modifica `src/main/resources/import.sql`, que contiene únicamente los datos iniciales. Para conservar las cuentas y cambios después de reiniciar, usa `SPRING_JPA_HIBERNATE_DDL_AUTO=update` después de la primera carga inicial con `create`.
 
 `PUT /api/reservas/{id}` permite editar la sala, el horario y los asistentes de una reserva `PENDING`; conserva el miembro y los servicios asociados y vuelve a validar disponibilidad, sede, capacidad y horarios. Un miembro solo puede modificar sus propias reservas.
 

@@ -61,6 +61,7 @@ class ApplicationContextTest {
 
         mockMvc.perform(get("/login")).andExpect(status().isOk())
             .andExpect(content().string(org.hamcrest.Matchers.containsString("CoWorkHub")))
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("showRegister")))
             .andExpect(content().string(org.hamcrest.Matchers.containsString("/js/app.js")));
         mockMvc.perform(get("/dashboard")).andExpect(status().isOk())
             .andExpect(content().string(org.hamcrest.Matchers.containsString("Reservas recientes")));
@@ -68,6 +69,27 @@ class ApplicationContextTest {
             .andExpect(content().string(org.hamcrest.Matchers.containsString(".sidebar")));
         mockMvc.perform(get("/js/app.js")).andExpect(status().isOk())
             .andExpect(content().string(org.hamcrest.Matchers.containsString("coworkhub_token")));
+
+        mockMvc.perform(get("/auth/planes"))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.length()").value(3));
+        String registrationRequest = "{\"documentNumber\":\"CC-REG-9001\",\"fullName\":\"Nuevo Miembro\"," +
+            "\"email\":\"nuevo@example.com\",\"planId\":2,\"username\":\"nuevo\",\"password\":\"registro123\"}";
+        MvcResult registration = mockMvc.perform(post("/auth/registro").contentType("application/json")
+                .content(registrationRequest))
+            .andExpect(status().isCreated()).andExpect(jsonPath("$.tipo").value("Bearer")).andReturn();
+        String registrationToken = com.jayway.jsonpath.JsonPath.read(
+            registration.getResponse().getContentAsString(), "$.token");
+        MvcResult profile = mockMvc.perform(get("/auth/perfil").header("Authorization", "Bearer " + registrationToken))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.usuario").value("nuevo"))
+            .andExpect(jsonPath("$.rol").value("MEMBER")).andReturn();
+        int registeredMemberId = com.jayway.jsonpath.JsonPath.read(
+            profile.getResponse().getContentAsString(), "$.miembroId");
+        mockMvc.perform(get("/api/miembros/" + registeredMemberId)
+                .header("Authorization", "Bearer " + registrationToken))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.planId").value(2));
+        mockMvc.perform(post("/auth/registro").contentType("application/json")
+                .content(registrationRequest))
+            .andExpect(status().isConflict()).andExpect(jsonPath("$.codigo").value("RN-11"));
 
         assertEquals(401, mockMvc.perform(get("/api/sedes")).andReturn().getResponse().getStatus());
         MvcResult login = mockMvc.perform(post("/auth/login").contentType("application/json")
@@ -126,6 +148,8 @@ class ApplicationContextTest {
         mockMvc.perform(get("/v3/api-docs")).andExpect(status().isOk())
             .andExpect(jsonPath("$.paths['/api/reservas/{id}'].put").exists())
             .andExpect(jsonPath("$.paths['/api/reservas/{id}/cancelar']").exists())
+            .andExpect(jsonPath("$.paths['/auth/planes'].get").exists())
+            .andExpect(jsonPath("$.paths['/auth/registro'].post").exists())
             .andExpect(jsonPath("$.components.securitySchemes.bearerAuth.scheme").value("bearer"));
         mockMvc.perform(get("/actuator/health")).andExpect(status().isOk())
             .andExpect(jsonPath("$.status").value("UP"));

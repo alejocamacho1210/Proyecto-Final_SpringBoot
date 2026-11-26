@@ -80,7 +80,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   font-weight: 700;
 }
 
-.stack input, .filter-row input, .filter-row select, .form-grid input, .form-grid select, .month-filter input {
+.stack input, .stack select, .filter-row input, .filter-row select, .form-grid input, .form-grid select, .month-filter input {
   width: 100%;
   min-height: 43px;
   padding: 10px 12px;
@@ -90,7 +90,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   color: var(--ink);
 }
 
-.stack input:focus, .filter-row input:focus, .filter-row select:focus, .form-grid input:focus,
+.stack input:focus, .stack select:focus, .filter-row input:focus, .filter-row select:focus, .form-grid input:focus,
 .form-grid select:focus, .month-filter input:focus {
   border-color: var(--blue);
   box-shadow: 0 0 0 3px #e0e7ff;
@@ -126,6 +126,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .demo-users { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; margin-top: 18px; color: var(--muted); font-size: .78rem; }
 .demo-users button { padding: 6px 10px; border: 1px solid var(--line); border-radius: 999px; background: white; cursor: pointer; }
 .demo-users button:hover { border-color: #c7d2fe; background: var(--blue-soft); color: var(--blue); }
+.auth-switch { display: flex; justify-content: center; align-items: center; gap: 4px; margin: 18px 0 0; color: var(--muted); font-size: .85rem; }
 
 .sidebar {
   position: fixed;

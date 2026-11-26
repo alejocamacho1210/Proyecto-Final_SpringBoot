@@ -22,11 +22,38 @@
             <p id="loginError" class="error" role="alert"></p>
             <button class="primary" type="submit">Iniciar sesión</button>
         </form>
+        <form id="registerForm" class="stack" hidden>
+            <label>Documento
+                <input id="registerDocumentNumber" name="documentNumber" autocomplete="off" required>
+            </label>
+            <label>Nombre completo
+                <input id="registerFullName" name="fullName" autocomplete="name" required>
+            </label>
+            <label>Correo electrónico
+                <input id="registerEmail" name="email" type="email" autocomplete="email" required>
+            </label>
+            <label>Plan
+                <select id="registerPlan" name="planId" required>
+                    <option value="">Cargando planes...</option>
+                </select>
+            </label>
+            <label>Usuario
+                <input id="registerUsername" name="username" autocomplete="username" required>
+            </label>
+            <label>Contraseña (mínimo 8 caracteres)
+                <input id="registerPassword" name="password" type="password" autocomplete="new-password" minlength="8" required>
+            </label>
+            <p id="registerError" class="error" role="alert"></p>
+            <button class="primary" type="submit">Crear cuenta</button>
+        </form>
+        <p id="loginSwitch" class="auth-switch">¿No tienes cuenta? <button id="showRegister" class="text-button" type="button">Regístrate</button></p>
+        <p id="registerSwitch" class="auth-switch" hidden>¿Ya tienes cuenta? <button id="showLogin" class="text-button" type="button">Inicia sesión</button></p>
         <div class="demo-users">
             <span>Pruebas</span>
             <button type="button" data-user="admin">Admin</button>
             <button type="button" data-user="recepcionista">Recepción</button>
             <button type="button" data-user="ana">Ana</button>
+            <button type="button" data-user="luis">Luis</button>
         </div>
     </main>
     <script src="/js/app.js"></script>
